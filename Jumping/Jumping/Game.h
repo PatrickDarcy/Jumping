@@ -13,15 +13,21 @@ public:
 	/// main method for game
 	/// </summary>
 	void run();
+	int const MAX_PLAYER = 10;
+
 	sf::RectangleShape m_Player;
 	sf::RectangleShape m_ground;
-	sf::Sprite m_enemy;
+	sf::RectangleShape m_enemy[10];
+	sf::Text Score;
+	sf::Font arialFont;
 	enum playerState { grounded, jumping, falling };
 	playerState playerstate;
 	int playerY = 100;
 	int enemyX = 725;
-	int const MAX_HEIGHT = 200;
+	int const MAX_HEIGHT = 225;
 	int const MIN_HEIGHT = 100;
+	float score;
+
 private:
 
 	void processEvents();

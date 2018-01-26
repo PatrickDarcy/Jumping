@@ -10,13 +10,13 @@ Game::Game() :
 	playerstate{grounded}
 
 {
-	sf::Texture texture_enemy;
-	if (!texture_enemy.loadFromFile("stalagtite.gif"))
+	score = 0;
+	for (int index = 0; index < MAX_PLAYER; index++)
 	{
-		std::cout << "Error" << std::endl;
+		m_enemy[index].setSize(sf::Vector2f{ 50,50 });
+		m_enemy[index].setPosition(enemyX, 100);
+		m_enemy[index].setFillColor(sf::Color::Red);
 	}
-	m_enemy.setPosition(enemyX, 100);
-
 	m_ground.setSize(sf::Vector2f{ 800, 100 });
 	m_ground.setPosition(0, 0);
 	m_ground.setFillColor(sf::Color::Green);
@@ -24,6 +24,16 @@ Game::Game() :
 	m_Player.setSize(sf::Vector2f{ 50,50 });
 	m_Player.setPosition(100, 100);
 	m_Player.setFillColor(sf::Color::Cyan);
+
+	if (!arialFont.loadFromFile("c:\\windows\\fonts\\arial.ttf"))
+	{
+		std::cout << "Error with font" << std::endl;
+	}
+	Score.setFont(arialFont);
+	Score.setCharacterSize(20);
+	Score.setPosition(sf::Vector2f{ 0,50 });
+	Score.setFillColor(sf::Color::Black);
+	Score.setString("Score: " + std::to_string(score));
 }
 
 
@@ -82,12 +92,15 @@ void Game::processEvents()
 /// <param name="t_deltaTime">time interval per frame</param>
 void Game::update(sf::Time t_deltaTime)
 {
-	enemyX -= 5;
-	m_enemy.setPosition(enemyX, 100);
-
-	if (enemyX == 0)
+	for (int index = 0; index < MAX_PLAYER; index++)
 	{
-		enemyX = 800;
+		enemyX --;
+		m_enemy[index].setPosition(enemyX, 100);
+
+		if (enemyX == 0)
+		{
+			enemyX = 800;
+		}
 	}
 	if (playerstate == grounded)
 	{
@@ -101,7 +114,7 @@ void Game::update(sf::Time t_deltaTime)
 		playerY += 5;
 		m_Player.setPosition(100, playerY);
 
-		if (playerY == MAX_HEIGHT)
+		if (playerY >= MAX_HEIGHT)
 		{
 			playerstate = falling;
 		}
@@ -111,21 +124,34 @@ void Game::update(sf::Time t_deltaTime)
 		playerY -= 5;
 		m_Player.setPosition(100, playerY);
 
-		if (playerY == MIN_HEIGHT)
+		if (playerY <= MIN_HEIGHT)
 		{
 			playerstate = grounded;
 		}
 		
 	}
-	if (m_Player.getGlobalBounds().intersects(m_enemy.getGlobalBounds()))
+	for (int index = 0; index < MAX_PLAYER; index++)
 	{
-		enemyX = 800;
+		if (m_Player.getGlobalBounds().intersects(m_enemy[index].getGlobalBounds()))
+		{
+			enemyX = 800;
+			score = score - 10;
+		}
+		if (score < 0)
+		{
+			score = 0;
+		}
+		else
+		{
+			score += 0.0166666667;
+		}
 	}
-
 	if (m_exitGame)
 	{
 		m_window.close();
 	}
+
+	Score.setString("Score: " + std::to_string(score));
 }
 
 /// <summary>
@@ -136,7 +162,11 @@ void Game::render()
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_ground);
 	m_window.draw(m_Player);
-	m_window.draw(m_enemy);
+	for (int index = 0; index < MAX_PLAYER; index++)
+	{
+		m_window.draw(m_enemy[index]);
+	}
+	m_window.draw(Score);
 	m_window.display();
 }
 
