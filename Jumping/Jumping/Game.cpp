@@ -14,7 +14,8 @@ Game::Game() :
 	for (int index = 0; index < MAX_PLAYER; index++)
 	{
 		m_enemy[index].setSize(sf::Vector2f{ 50,50 });
-		m_enemy[index].setPosition(enemyX, 100);
+		m_enemy[index].setPosition(800+index*150, 100);
+	
 		m_enemy[index].setFillColor(sf::Color::Red);
 	}
 	m_ground.setSize(sf::Vector2f{ 800, 100 });
@@ -94,12 +95,19 @@ void Game::update(sf::Time t_deltaTime)
 {
 	for (int index = 0; index < MAX_PLAYER; index++)
 	{
-		enemyX --;
-		m_enemy[index].setPosition(enemyX, 100);
+		
+		m_enemy[index].move(-1, 0);
 
-		if (enemyX == 0)
+		
+	}
+	if (m_enemy[MAX_PLAYER - 1].getPosition().x < 0)
+	{
+		for (int index = 0; index < MAX_PLAYER; index++)
 		{
-			enemyX = 800;
+			m_enemy[index].setSize(sf::Vector2f{ 50,50 });
+			m_enemy[index].setPosition(800 + index * 150, 100);
+
+			m_enemy[index].setFillColor(sf::Color::Red);
 		}
 	}
 	if (playerstate == grounded)
@@ -134,7 +142,7 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		if (m_Player.getGlobalBounds().intersects(m_enemy[index].getGlobalBounds()))
 		{
-			enemyX = 800;
+			
 			score = score - 10;
 		}
 		if (score < 0)
@@ -144,6 +152,7 @@ void Game::update(sf::Time t_deltaTime)
 		else
 		{
 			score += 0.0166666667;
+			score1 = score;
 		}
 	}
 	if (m_exitGame)
@@ -151,7 +160,7 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	Score.setString("Score: " + std::to_string(score));
+	Score.setString("Score: " + std::to_string(score1));
 }
 
 /// <summary>
