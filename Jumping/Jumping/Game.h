@@ -3,6 +3,7 @@
 #define GAME
 
 #include <SFML/Graphics.hpp>
+#include "WorldSquare.h"
 
 class Game
 {
@@ -16,23 +17,32 @@ public:
 	int const MAX_PLAYER = 2;
 
 	sf::RectangleShape m_Player;
-	sf::RectangleShape m_ground;
-	sf::RectangleShape m_enemy[2];
-	sf::Text Score;
-	sf::Font arialFont;
-	enum playerState { grounded, jumping, falling };
-	playerState playerstate;
-	int playerY = 100;
-	int enemyX = 725;
-	int const MAX_HEIGHT = 250;
-	int const MIN_HEIGHT = 100;
-	float score;
-	int score1;
+	int isTherePlatform[12][12] = { 0,0,0,0,0,0,0,0,0,0,0,0,
+									1,1,1,1,0,0,0,0,1,1,1,1,
+									0,0,0,0,0,0,0,0,0,0,0,0,
+									0,0,0,0,1,1,1,1,0,0,0,0,
+									0,0,0,0,0,0,0,0,0,0,0,0,
+									1,1,1,1,1,1,1,1,1,0,0,0,
+									0,0,0,0,0,0,0,0,0,0,0,0,
+									0,0,0,1,1,1,1,1,1,1,1,1,
+									0,0,0,0,0,0,0,0,0,0,0,0,
+									1,1,1,1,1,1,1,1,0,0,0,0,
+									0,0,0,0,0,0,0,0,0,0,0,0,
+									1,1,1,1,1,1,1,1,1,1,1,1 };
+
+	enum m_playerState { grounded, jumping, falling };
+	m_playerState playerstate;
+	sf::Vector2f m_playerPos = {100,500};
+	float m_playerSpeed = 2.5;
+	int const MAX_HEIGHT = 350;
+	int const MIN_HEIGHT = 500;
+	WorldSquare m_platform[12][12];
 
 private:
 
 	void processEvents();
 	void update(sf::Time t_deltaTime);
+	void playerMovement();
 	void render();
 
 	sf::RenderWindow m_window; // main SFML window

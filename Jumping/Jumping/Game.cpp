@@ -5,36 +5,18 @@
 
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 800, 600, 32 }, "Jumping Game" },
+	m_window{ sf::VideoMode{ 600, 600, 32 }, "Jumping Game" },
 	m_exitGame{ false }, //when true game will exit
-	playerstate{grounded}
+	playerstate{ grounded }
+
 
 {
-	score = 0;
-	for (int index = 0; index < MAX_PLAYER; index++)
-	{
-		m_enemy[index].setSize(sf::Vector2f{ 50,50 });
-		m_enemy[index].setPosition(800+index*150, 100);
-	
-		m_enemy[index].setFillColor(sf::Color::Red);
-	}
-	m_ground.setSize(sf::Vector2f{ 800, 100 });
-	m_ground.setPosition(0, 0);
-	m_ground.setFillColor(sf::Color::Green);
+
 
 	m_Player.setSize(sf::Vector2f{ 50,50 });
-	m_Player.setPosition(100, 100);
+	m_Player.setPosition(100, 500);
 	m_Player.setFillColor(sf::Color::Cyan);
 
-	if (!arialFont.loadFromFile("c:\\windows\\fonts\\arial.ttf"))
-	{
-		std::cout << "Error with font" << std::endl;
-	}
-	Score.setFont(arialFont);
-	Score.setCharacterSize(20);
-	Score.setPosition(sf::Vector2f{ 0,50 });
-	Score.setFillColor(sf::Color::Black);
-	Score.setString("Score: " + std::to_string(score));
 }
 
 
@@ -93,23 +75,52 @@ void Game::processEvents()
 /// <param name="t_deltaTime">time interval per frame</param>
 void Game::update(sf::Time t_deltaTime)
 {
-	for (int index = 0; index < MAX_PLAYER; index++)
+	for (int i = 0; i < 12; i++)
 	{
-		
-		m_enemy[index].move(-1, 0);
-
-		
-	}
-	if (m_enemy[MAX_PLAYER - 1].getPosition().x < 0)
-	{
-		for (int index = 0; index < MAX_PLAYER; index++)
+		for (int j = 0; j < 12; j++)
 		{
-			m_enemy[index].setSize(sf::Vector2f{ 50,50 });
-			m_enemy[index].setPosition(800 + index * 150, 100);
-
-			m_enemy[index].setFillColor(sf::Color::Red);
+			//if (isTherePlatform[i][j] == 1 && m_Player.getGlobalBounds().intersects(m_platform[i][j].getGlobalBounds()))
+			//{
+			//	
+			//}
 		}
 	}
+
+
+	playerMovement();
+
+	for (int i = 0; i < 12; i++)
+	{
+		for (int j = 0; j < 12; j++)
+		{
+			int r = isTherePlatform[i][j];
+			int rX = i * 50;
+			int rY = j * 50;
+			m_platform[i][j].update(r, rY, rX );
+		}
+	}
+
+	if (m_exitGame)
+	{
+		m_window.close();
+	}
+
+}
+
+void Game::playerMovement()
+{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			m_playerPos.x -= m_playerSpeed;
+			m_Player.setPosition(m_playerPos);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			m_playerPos.x += m_playerSpeed;
+			m_Player.setPosition(m_playerPos);
+		}
+
 	if (playerstate == grounded)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
@@ -119,49 +130,27 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	if (playerstate == jumping)
 	{
-		playerY += 5;
-		m_Player.setPosition(100, playerY);
+		m_playerPos.y -= 5;
+		m_Player.setPosition(m_playerPos);
 
-		if (playerY >= MAX_HEIGHT)
+		if (m_playerPos.y <= MAX_HEIGHT)
 		{
 			playerstate = falling;
 		}
 	}
 	if (playerstate == falling)
 	{
-		playerY -= 5;
-		m_Player.setPosition(100, playerY);
+		m_playerPos.y += 5;
+		m_Player.setPosition(m_playerPos);
 
-		if (playerY <= MIN_HEIGHT)
+		if (m_playerPos.y >= MIN_HEIGHT)
 		{
 			playerstate = grounded;
 		}
-		
-	}
-	for (int index = 0; index < MAX_PLAYER; index++)
-	{
-		if (m_Player.getGlobalBounds().intersects(m_enemy[index].getGlobalBounds()))
-		{
-			
-			score = score - 10;
-		}
-		if (score < 0)
-		{
-			score = 0;
-		}
-		else
-		{
-			score += 0.0166666667;
-			score1 = score;
-		}
-	}
-	if (m_exitGame)
-	{
-		m_window.close();
-	}
 
-	Score.setString("Score: " + std::to_string(score1));
+	}
 }
+
 
 /// <summary>
 /// draw the frame and then switch bufers
@@ -169,13 +158,15 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
-	m_window.draw(m_ground);
 	m_window.draw(m_Player);
-	for (int index = 0; index < MAX_PLAYER; index++)
+
+	for (int i = 0; i < 12; i++)
 	{
-		m_window.draw(m_enemy[index]);
+		for (int j = 0; j < 12; j++)
+		{
+			m_platform[i][j].draw(m_window);
+		}
 	}
-	m_window.draw(Score);
 	m_window.display();
 }
 
